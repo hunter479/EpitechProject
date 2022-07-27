@@ -1,0 +1,32 @@
+---
+- name: "Create /app directory"
+  file:
+    path: /app
+    state: directory
+- name: "Copy of the file"
+  copy:
+    src: worker.tar
+    dest: /app/
+- name: "Install packages"
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - maven
+      - openjdk-11-jre
+- name: "Untar the file"
+  unarchive:
+    src: /app/worker.tar
+    dest: /app
+    remote_src: yes
+- name: "Generating worker.service"
+  template:
+    src: files/worker.service
+    dest: /etc/systemd/system/worker.service
+- name: "Install maven depencies"
+  shell: cd /app/worker && mvn dependency:resolve && mvn package
+- name: "Launching Server"
+  service:
+    name: worker
+    enabled: yes
+    state: started

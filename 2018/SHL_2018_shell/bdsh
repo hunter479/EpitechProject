@@ -1,0 +1,678 @@
+#!/bin/bash
+
+##Epitech
+
+array=()
+tmp_array=()
+args=()
+full_size=()
+index_array=()
+
+incre=1
+option=$1
+file=$2
+command=$3
+type=$4
+data=$5
+info=$6
+
+function end_file
+{
+    data="$1"
+    index=0
+
+    old_IFS=$IFS
+    IFS=$'\n'
+    for i in $(cat $data)
+    do
+        index=$(expr $index + 1)
+    done
+    IFS=$old_IFS
+    echo "$index"
+}
+
+function find_line
+{
+    data=$1
+    pattern=$2
+    index=0
+
+    old_IFS=$IFS
+    IFS=$'\n'
+    for ligne in $(cat $data)
+    do
+        grep -q "$pattern" <<< $ligne
+        if [ $? = 0 ]
+        then
+            IFS=$old_IFS
+            echo "$index"
+            return 0
+        fi
+        index=$(expr $index + 1)
+    done
+    IFS=$old_IFS
+    echo "$index"
+}
+
+function print_usage
+{
+    echo "Usage: ./bdsh [OPTION]... [COMMAND] [REQUEST]"
+    exit 0
+}
+
+function cut_line
+{
+    string=$1
+    pattern=$2
+
+    old_IFS=$IFS
+    IFS=$"$pattern"
+    for ligne in $string
+    do
+        array+=($ligne)
+    done
+    IFS=$old_IFS
+}
+
+function recup_desc
+{
+    file=$1
+    data=$2
+    toInsert=$3
+    pattern="\"desc_$data\""
+    index=$(find_line "$file" "$pattern")
+
+    index=$(expr $index + 1)
+    grep -q "$pattern" <<< "$(sed "$index q;d" $file)"
+    if [ $? != 0 ]; then
+        >&2 echo "Table does not exist"
+        exit 1
+    fi
+    index=$(expr $index + 1)
+    grep -q "]" <<< "$(sed "$index q;d" $file)"
+    while [ $? != 0 ]; do
+        tmp=$(tr -d "," <<< "$(sed "$index q;d" $file)")
+        tmp=$(tr -d " " <<< "$tmp")
+        tmp=$(tr -d "\r" <<< "$tmp")
+        array+=("$tmp")
+        index=$(expr $index + 1)
+        grep -q "]" <<< "$(sed "$index q;d" $file)"
+    done
+}
+
+function is_there_id
+{
+    string=$1
+
+    old_IFS=$IFS
+    IFS=","
+    for i in $string
+    do
+        if [ $(echo $i | cut -d"=" -f1) = "id" ]; then
+            IFS=$old_IFS
+            echo $i | cut -d"=" -f2
+            exit 0
+        fi
+    done
+    IFS=$old_IFS
+    echo "0"
+    exit 0
+
+}
+
+function concat_insert
+{
+    concat=$1
+    tmp=()
+    old_IFS=$IFS
+    IFS=$","
+    bool="0"
+
+    for a in ${array[@]}; do
+        bool="0"
+        for i in $concat ;do
+            grep -q "\"$(cut -d '=' -f1 <<< $i)"\" <<< "$a"
+            if [ $? = 0 ]; then
+                str=$(echo $i | cut -d"=" -f2)
+                tmp+=("$a: \"$str\",")
+                bool="1"
+            fi
+        done
+        if [ "$bool" = "0" ]; then
+            tmp+=("$a: \"\",")
+        fi
+    done
+    IFS=$'\n'
+    array=()
+    for i in ${tmp[@]}; do
+        array+=("$i")
+    done
+    IFS=$old_IFS
+}
+
+function check_insert
+{
+    check=$1
+
+    to_compare=$(echo "${array[*]}")
+    old_IFS=$IFS
+    IFS=$','
+    for i in $check
+    do
+        grep -q "\"$(cut -d '=' -f1 <<< $i)"\" <<< "$to_compare"
+        if [ "$?" != 0 ]; then
+            echo "Fields not found"
+            IFS=$old_IFS
+            exit 1
+        fi
+    done
+    IFS=$old_IFS
+}
+
+function insert_table
+{
+    file=$1
+    data=$2
+    if [ "$3" = "" ];then
+        >&2 echo "No information to insert"
+        exit 1
+    fi
+    recup_desc "$file" "$data"
+    check_insert "$3"
+    add_or_not="$(is_there_id "$3")"
+    concat_insert "$3"
+
+    index=$(find_line "$file" "data_$data")
+    index=$(expr $index + 1)
+    grep -q "data_$data" <<< "$(sed "${index} q;d" $file)"
+    if [ $? = 1 ]; then
+        index=$(expr $index - 1)
+        grep -q "}" <<< "$(sed "${index} q;d" $file)"
+        if [ $? = 0 ]; then
+            index=$(expr $index - 1)
+            sed -i "${index}c\  \]," $file;
+        fi
+        index=$(expr $index + 1)
+        sed -i "${index}i\  \"data_$data\": [" $file;
+        index=$(expr $index + 1)
+        sed -i "${index}i\  \]" $file;
+    fi
+    if [ "$add_or_not" != "0" ]; then
+        pattern="\"id\": \"$add_or_not\""
+    else
+        index=$(expr $index + 1)
+        pattern="\]"
+    fi
+
+    index=$(find_line "$file" "data_$data")
+    index=$(expr $index + 1)
+    grep -q "$pattern" <<< "$(sed "$index q;d" $file)"
+    while [ $? != 0 ]
+    do
+        index=$(expr $index + 1)
+        grep -q "]" <<< "$(sed "$index q;d" $file)"
+        if [ $? = 0 ]; then
+            grep -q "]" <<< "$(sed "$index q;d" $file)"
+        else
+            grep -q "$pattern" <<< "$(sed "$index q;d" $file)"
+        fi
+    done
+    old_IFS=$IFS
+    grep -q "]" <<< "$(sed "$index q;d" $file)"
+    if [ $? = 0 ]; then
+        index=$(expr $index - 1)
+        grep -q "}" <<< "$(sed "$index q;d" $file)"
+        if [ $? = 0 ]; then
+            sed -i "${index}c\    \}," $file;
+        fi
+        index=$(expr $index + 1)
+        sed -i "${index}i\    \{" $file;
+        index=$(expr $index + 1)
+        IFS=$'\n'
+        for i in ${array[@]}; do
+            sed -i "${index}i\      $i" $file;
+            index=$(expr $index + 1)
+        done
+        index=$(expr $index - 1)
+        remove_virg="$(tr -d "," <<< "$(sed "$index q;d" $file)")"
+        sed -i "${index}c\\$remove_virg" $file;
+        index=$(expr $index + 1)
+        sed -i "${index}i\    \}" $file;
+        IFS=$old_IFS
+        exit 0
+    else
+        IFS=$'\n'
+        for i in ${array[@]}; do
+            sed -i "${index}c\      $i" $file;
+            index=$(expr $index + 1)
+        done
+        index=$(expr $index - 1)
+        remove_virg="$(tr -d "," <<< "$(sed "$index q;d" $file)")"
+        sed -i "${index}c\\$remove_virg" $file;
+        IFS=$old_IFS
+    fi
+    exit 0
+}
+
+function describe
+{
+    file=$1
+    data=$2
+
+    if [ "$data" = "" ]; then
+        >&2 echo "Table not found when describe"
+        exit 1
+    fi
+    recup_desc "$file" "$data"
+    if [ "${array[*]}" = "" ]; then
+        >&2 echo "Fields not found when describe"
+        exit 1
+    fi
+    for i in ${array[@]}
+    do
+        tmp=$(tr -d "\"" <<< "$i")
+        echo "$tmp"
+    done
+    exit 0
+}
+
+function table_create
+{
+    file=$1
+    data=$2
+    if [ "$data" = "" ];then
+        >&2 echo "No name for the table"
+        exit 1
+    fi
+    if [ "$(head -n 1 $file)" != "{" ] || [ "$(tail -n 1 $file)" != "}" ]; then
+        >&2 echo "Files not correctly formated"
+        exit 1
+    fi
+    pattern="\"desc_$data\""
+    index=$(find_line "$file" "$pattern")
+    toInsert=$3
+
+    index=$(expr $index + 1)
+    grep -q "$pattern" <<< $(sed "$index q;d" $file)
+    if [ $? = 0 ]
+    then
+        >&2 echo "Table already exist when create table"
+        exit 1
+    fi
+    cut_line "$toInsert" ","
+    index=$(find_line "$file" "\"data_*")
+    grep -q "}" <<< "$(sed "${index} q;d" $file)"
+    if [ $? = 0 ]; then
+        index=$(expr $index - 1)
+        grep -q "{" <<< "$(sed "${index} q;d" $file)"
+        if [ $? != 0 ]; then
+            sed -i "${index}c\  \]," $file;
+        fi
+    fi
+    index=$(expr $index + 1)
+    sed -i "${index}i\  \"desc_$data\": [" $file;
+    index=$(expr $index + 1)
+    for i in ${array[@]}; do
+        sed -i "${index}i\    \"$i\"," $file;
+        index=$(expr $index + 1)
+    done
+    index=$(expr $index - 1)
+    tmp=$(sed "$index q;d" $file)
+    tmp=$(tr -d ',' <<< "$tmp")
+    sed -i "${index}c\\$tmp" $file
+    index=$(find_line "$file" "\"data_*")
+    grep -q "}" <<< "$(sed "${index} q;d" $file)"
+    if [ $? = 0 ]; then
+        sed -i "${index}i\  \]" $file;
+        else
+        index=$(expr $index + 1)
+        sed -i "${index}i\  \]," $file;
+    fi
+    exit 0
+}
+
+function db_create
+{
+    if [ ! -f "$1" ]
+    then
+        touch "$1"
+        echo "{" > "$1"
+        echo "}" >> "$1"
+        exit 0
+    else
+        >&2 echo "Database already exist when create database"
+        exit 1
+    fi
+}
+
+function isCreated
+{
+    if [ ! -f "$file" ]
+    then
+        >&2 echo "File not found!"
+        exit 1
+    fi
+}
+
+function fieldExist
+{
+    my_bool=0
+    to_check=()
+    for i in ${array[@]}
+    do
+        i=$(tr -d "\"" <<< "$i")
+        to_check+=($i)
+    done
+
+    for i in ${tmp_array[@]}
+    do
+        for j in ${to_check[@]}
+        do
+            if [ "$j" = "$i" ]
+            then
+                my_bool=1
+            fi
+        done
+        if [ $my_bool = 0 ]
+        then
+            >&2 echo "Field not found when select"
+            exit 1
+        fi
+        my_bool=0
+    done
+}
+
+function get_names
+{
+    file=$1
+    type=$2
+    info=$3
+    info_array=()
+    pattern="\"data_$type\""
+    index=$(find_line "$file" "$pattern")
+
+    index=$(expr $index + 1)
+    grep -q "$pattern" <<< "$(sed "$index q;d" $file)"
+    if [ $? != 0 ]; then
+        >&2 echo "Table not found"
+        exit 1
+    fi
+    index=$(expr $index + 1)
+    stock=0
+    grep -q "]" <<< "$(sed "$index q;d" $file)"
+    while [ $? != 0 ]; do
+        tmp="$(sed "$index q;d" $file)"
+        grep -q "$info" <<< "$tmp"
+        if [ $? = 0 ]
+        then
+            tmp=${tmp#*: }
+            tmp=$(tr -d "," <<< "$tmp")
+            tmp=$(tr -d "\"" <<< "$tmp")
+            tmp=$(tr -d "\r" <<< "$tmp")
+            info_array+=("$tmp")
+            length=${#tmp}
+            if [ $length -gt $stock ]
+            then
+                stock=$length
+            fi
+        fi
+        index=$(expr $index + 1)
+        grep -q "]" <<< "$(sed "$index q;d" $file)"
+    done
+    print_names "$stock" "$info"
+}
+
+function print_names
+{
+    stock=$1
+    info=$2
+    if [ ${#info} -gt $stock ]
+    then
+        full_size+=("${#info}")
+        to_go=("${#info}")
+        ((to_go+=1))
+        i=("${#info}")
+    else
+        full_size+=("$stock")
+        to_go=("$stock")
+        ((to_go+=1))
+        i=("${#info}")
+    fi
+    echo -n $info
+    array_length=${#tmp_array[@]}
+    while [ $i -le $to_go ]
+    do
+        echo -n " "
+        ((i+=1))
+    done
+    if [ $incre -eq $array_length ]
+    then
+        echo -n ""
+    else
+        echo -n "| "
+    fi
+    ((incre+=1))
+}
+
+function get_data
+{
+    file=$1
+    type=$2
+    info_array=()
+    pattern="\"data_$type\""
+    index=$(find_line "$file" "$pattern")
+
+    index=$(expr $index + 1)
+    grep -q "$pattern" <<< "$(sed "$index q;d" $file)"
+    if [ $? != 0 ]; then
+        >&2 echo "Table does not exist"
+        exit 1
+    fi
+    index=$(expr $index + 1)
+    stock=0
+    incre=0
+    echo
+
+    grep -q "]" <<< "$(sed "$index q;d" $file)"
+    while [ $? != 0 ]; do
+        p=0
+        checking=1
+        for i in ${index_array[@]}
+        do
+            tmp2=$(($index + $i))
+            ((tmp2+=1))
+            tmp="$(sed "$tmp2 q;d" $file)"
+            tmp=${tmp#*: }
+            tmp=$(tr -d "," <<< "$tmp")
+            tmp=$(tr -d "\"" <<< "$tmp")
+            tmp=$(tr -d "\r" <<< "$tmp")
+            tmp2=index
+            j=${#tmp}
+            echo -n $tmp" "
+            sizee=${full_size[$p]}
+            while [ $j -le $sizee ]
+            do
+                echo -n " "
+                ((j+=1))
+            done
+            if [ $checking -lt ${#tmp_array[@]} ]
+            then
+                echo -n "| "
+            fi
+            ((p+=1))
+            ((checking+=1))
+        done
+        p=0
+        echo
+        index=$((${#array[@]} + $index + 2))
+        grep -q "]" <<< "$(sed "$index q;d" $file)"
+    done
+    ((incre+=1))
+}
+
+function print_dashes
+{
+    size=0
+    echo
+    for i in ${full_size[@]}
+    do
+        size=$[size+i]
+        ((size+=2))
+    done
+    j=1
+    while [ $j -lt ${#tmp_array[@]} ]
+    do
+        ((size+=2))
+        ((j+=1))
+    done
+    i=0
+    while [ $i -lt $size ]
+    do
+        echo -n "-"
+        ((i+=1))
+    done
+}
+
+function get_index
+{
+    old_IFS=$IFS
+    IFS=$","
+    for ligne in $2
+    do
+        tmp_array+=($ligne)
+    done
+    IFS=$old_IFS
+    data=$1
+    recup_desc "$file" "$data"
+    pos_index=0
+    for j in ${tmp_array[@]}
+    do
+        for i in ${array[@]}
+        do
+            i=$(tr -d "\"" <<< "$i")
+            if [ $j = $i ]
+            then
+                index_array+=("$pos_index")
+            fi
+            ((pos_index+=1))
+        done
+        pos_index=0
+    done
+}
+
+function command_select
+{
+    get_index $@
+    fieldExist
+    if [ "${tmp_array[*]}" = "" ]; then
+        >&2 echo "Fields not found when select"
+        exit 1
+    fi
+    for i in ${tmp_array[@]}
+    do
+        get_names $file $1 $i
+    done
+    print_dashes
+    get_data $file $1
+}
+
+function which_command
+{
+    if [ "$1" = "create" ]; then
+        if [ "$2" = "database" ]
+        then
+            db_create "$file"
+            exit 0
+        elif [ "$2" = "table" ]; then
+            if [ "$(head -n 1 $file)" != "{" ] || [ "$(tail -n 1 $file)" != "}" ]; then
+                >&2 echo "Files not correctly formated"
+                exit 1
+            fi
+            table_create "$file" "$data" "$info"
+            exit 0
+        else
+            >&2 echo "Syntax error in command line create (bad arguments, ...)"
+            exit 1
+        fi
+    fi
+    isCreated "$file"
+    if [ "$(head -n 1 $file)" != "{" ] || [ "$(tail -n 1 $file)" != "}" ]; then
+        >&2 echo "Files not correctly formated"
+        exit 1
+    fi
+    if [ "$1" = "describe" ]
+    then
+        describe "$file" "$2"
+        exit 0
+    fi
+    if [ "$1" = "select" ]
+    then
+        shift
+        command_select "$@"
+        exit 0
+    fi
+    if [ "$1" = "insert" ]
+    then
+        shift
+        insert_table "$file" "$type" "$data"
+        exit 0
+    fi
+}
+
+function  check_additionnal_option
+{
+    if [ "$1" = "-j" ]
+    then
+        echo "-j"
+    fi
+}
+
+function parse_arg
+{
+    if [ "$1" = "-j" ]
+    then
+        echo "-j"
+    fi
+    if [ "$1" = "-f" ]
+    then
+        file=$2
+        shift
+        shift
+        check_additionnal_option "$@"
+    elif [ $BDSH_File ]
+    then
+        file=$BDSH_File
+        command=$1
+        type=$2
+        data=$3
+        info=$4
+    else
+        cat ".bdshrc" > /dev/null 2>&1
+        if [ $? = 0 ]; then
+            ret=$(cat ".bdshrc")
+            ret="$(echo "$ret" | cut -d '=' -f2)"
+            if [ -z "$ret" ]
+            then
+                >&2 echo "Configuration file is empty"
+                exit 1
+            else
+                file=$ret;
+                command=$1
+                type=$2
+                data=$3
+                info=$4
+            fi
+        else
+            >&2 echo "Can't find file"
+            exit 1
+        fi
+    fi
+    if [ "$1" = "-h" ]
+    then
+        exit $(print_usage)
+    fi
+    args=$@
+    which_command "$@"
+}
+
+parse_arg "$@"

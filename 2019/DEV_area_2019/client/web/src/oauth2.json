@@ -1,0 +1,9 @@
+{
+    "microsoft": "https://login.microsoftonline.com/901cb4ca-b862-4029-9306-e5cd0f6d9f86/oauth2/v2.0/authorize?client_id=971ba623-d09d-40ab-9f46-29ad897dd88d&response_type=code&scope=openid+Mail.Read+offline_access+User.ReadWrite+User.ReadBasic.All&redirect_uri=https://www.area.com:8081/microsoft",
+    "yammer": "https://www.yammer.com/oauth2/authorize?client_id=cl7coSDecOhvh08AkWKg&response_type=code&redirect_url=https://www.area.com:8081/yammer",
+    "gitlab": "https://gitlab.com/oauth/authorize?client_id=3dea71e60ed478864d409ca1aee82d5ecd4f4234dc3621d46e15d240beaa9faa&redirect_uri=https://www.area.com:8081/gitlab&response_type=code&scope=api+read_user+read_repository+write_repository+read_registry+openid+profile+email",
+    "imgur": "https://api.imgur.com/oauth2/authorize?client_id=a12e84096da979d&response_type=token",
+    "spotify": "https://accounts.spotify.com/authorize?client_id=4c9db4d390d54c04ab928d78c19ec1af&response_type=code&redirect_uri=https://www.area.com:8081/spotify&scope=user-read-private%20user-read-email%20user-modify-playback-state",
+    "facebook": "https://www.facebook.com/v6.0/dialog/oauth?response_type=token&display=popup&client_id=203866147425781&redirect_uri=https://www.area.com:8081/facebook&auth_type=rerequest&scope=user_hometown%2Cuser_location%2Cuser_likes%2Cuser_photos%2Cuser_status%2Cuser_posts%2Cuser_age_range%2Cpublic_profile%2Cuser_friends%2Cemail%2Cuser_birthday%2Cuser_gender%2Cuser_link%2Cuser_tagged_places%2Cuser_videos",
+    "twitter": "https://api.twitter.com/oauth/authorize?oauth_token="
+}

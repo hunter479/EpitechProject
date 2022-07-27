@@ -1,0 +1,17 @@
+---
+- name: "Install packages"
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - redis-server
+      - php-redis
+- name: "Copy file redis.conf"
+  copy:
+    src: files/redis.conf
+    dest: /etc/redis/redis.conf
+- name: "Starting Redis Server"
+  service:
+    name: redis
+    enabled: yes
+    state: restarted

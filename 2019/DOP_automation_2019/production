@@ -1,0 +1,21 @@
+[poll_host]
+poll ansible_host=178.62.28.100
+
+[worker_host]
+worker ansible_host=142.93.39.194
+
+[redis_host]
+redis ansible_host=178.128.162.133
+
+[postgresql_host]
+postgresql ansible_host=178.62.71.184
+
+[result_host]
+result ansible_host=142.93.39.200
+
+[all:children]
+poll_host
+worker_host
+redis_host
+postgresql_host
+result_host

@@ -1,0 +1,115 @@
+version: '3'
+
+services:
+### BACKEND ###
+  db.area:
+    container_name: db_mongodb
+    image: mongo
+    restart: on-failure
+    networks:
+      - backend-tier
+    expose:
+      - "27017"
+    volumes:
+      - db-data:/data/db
+  mongo_ui.area:
+    container_name: db_mongo-express
+    image: mongo-express
+    restart: on-failure
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=db.area
+      - ME_CONFIG_MONGODB_PORT=27017
+    networks:
+      - backend-tier
+    expose:
+      - "8082"
+    depends_on:
+      - db.area
+  serveur:
+    container_name: db_api
+    build: ./server
+    restart: on-failure
+    expose:
+      - "8080"
+    networks:
+      - tunnel-tier
+      - backend-tier
+    depends_on:
+      - db.area
+
+### FRONTEND ###
+  client_web:
+    build:
+      context: ./client
+      dockerfile: web.Dockerfile
+    container_name: web
+    restart: on-failure
+    expose:
+      - "8081"
+    networks:
+      - tunnel-tier
+    depends_on:
+      - serveur
+      - client_mobile
+    volumes:
+      - shared_volumes:/app/public/apk
+  client_mobile:
+    build:
+      context: ./client
+      dockerfile: mobile.Dockerfile
+    container_name: mobile
+    restart: on-failure
+    volumes:
+      - shared_volumes:/apk
+
+### NGINX ###
+  proxy.area:
+    container_name: nginx-proxy
+    build: ./nginx
+    restart: on-failure
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8085:8085"
+      - "9000:9000"
+    networks:
+      - tunnel-tier
+      - backend-tier
+    volumes:
+      - $PWD/nginx/conf/conf.d:/etc/nginx/conf.d
+      - $PWD/certificate/certs:/etc/ssl/area
+    depends_on:
+      - ca.area
+      - portainer.area
+      - client_web
+      - client_mobile
+      - db.area
+      - mongo_ui.area
+
+### CA ###
+  ca.area:
+    container_name: certificates
+    build: ./certificate
+    volumes:
+      - $PWD/certificate:/certs
+
+### PORTAINER ###
+  portainer.area:
+    container_name: ui_portainer
+    image: portainer/portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - tunnel-tier
+
+volumes:
+  shared_volumes:
+  db-data:
+  portainer_data:
+
+networks:
+  tunnel-tier:
+  backend-tier:

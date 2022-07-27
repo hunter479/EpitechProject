@@ -1,0 +1,10 @@
+---
+- name: "Redis"
+  hosts: redis
+  user: root
+  become: true
+  gather_facts: no
+  vars:
+    import_playbook: ./group_vars/all.yml
+  roles:
+    - redis

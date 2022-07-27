@@ -1,0 +1,43 @@
+---
+- name: "Install packages"
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - python-psycopg2
+      - openssl
+      - libssl-dev
+      - libssl-doc
+      - postgresql
+      - libpq-dev
+- name: "Copy file pg_hba.conf"
+  copy:
+    src: files/pg_hba.conf
+    dest: /etc/postgresql/11/main/pg_hba.conf
+- name: "Editing postgresql.conf"
+  lineinfile:
+    dest: /etc/postgresql/11/main/postgresql.conf
+    regexp: '^(.*)listen_addresses(.*)$'
+    line: "listen_addresses = '*'"
+    backrefs: yes
+- name: "Launching Server"
+  service:
+    name: postgresql
+    enabled: yes
+    state: restarted
+- name: "Create database"
+  postgresql_db:
+    name: "{{ POSTGRESQL_DB }}"
+- name: "Creating user"
+  become: yes
+  become_user: postgres
+  shell: psql -c "CREATE USER {{ POSTGRESQL_USER }} WITH PASSWORD '{{ POSTGRESQL_PASSWORD }}';"
+- name: "Granting privilegies to user"
+  become: yes
+  become_user: postgres
+  shell: psql -c "GRANT ALL PRIVILEGES ON DATABASE "{{ POSTGRESQL_DB }}" to "{{ POSTGRESQL_USER }}";"
+- name: "Dumping database"
+  postgresql_db:
+    name: "{{ POSTGRESQL_DB }}"
+    state: dump
+    target: schema.sql

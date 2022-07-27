@@ -1,0 +1,7 @@
+Une ia :
+    - Analyse des objectifs :
+        - Zone de danger ? se sauver : attacker
+        - Power ups ?
+        - players ?
+
+    

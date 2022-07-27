@@ -1,0 +1,7 @@
+---
+  - import_playbook: playbook_base.yml
+  - import_playbook: playbook_redis.yml
+  - import_playbook: playbook_postgresql.yml
+  - import_playbook: playbook_poll.yml
+  - import_playbook: playbook_worker.yml
+  - import_playbook: playbook_result.yml

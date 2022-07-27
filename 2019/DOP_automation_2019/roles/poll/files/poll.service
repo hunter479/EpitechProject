@@ -1,0 +1,13 @@
+[Unit]
+Description={{ name }}
+After=network.target
+
+[Service]
+Type=simple
+Environment="REDIS_HOST={{ REDIS_HOST }}"
+WorkingDirectory=/app/{{ name }}
+ExecStart={{ command }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

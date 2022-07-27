@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>6</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>570</y>
+      <w>306</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>bg=green
+*Class: Server*
+--
+&lt;&lt;constructor&gt;&gt;+server(boost::asio::io_context&amp;, short);
+-void start();
+-void do_accept();
+--
+-tcp::acceptor _acceptor;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>564</y>
+      <w>204</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>bg=blue
+*Class: Session*
+--
+&lt;&lt;constructor&gt;&gt;+session(tcp::socket socket);
++void start();
+--
+-do_read();
+-do_write(const std::string &amp;);
+--
+-DbComm *_db;
+-User *_me;
+-Contact *_ct;
+-tcp::socket _socket;
+-std::string _ip;
+-enum { _max_length = 1024 };
+-char _data[_max_length];</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1044</x>
+      <y>534</y>
+      <w>390</w>
+      <h>204</h>
+    </coordinates>
+    <panel_attributes>bg=green
+*&lt;&lt;SINGLETON&gt;&gt;*
+*Class: DbComm*
+--
+&lt;&lt;constructor par copie&gt;&gt;+DbComm(const DbComm &amp;) = delete;
+&lt;&lt;destructor&gt;&gt;+~DbComm();
++const std::string command(const std::string &amp;, User *, Contact *);
++static DbComm *getInstance(void);
+--
+-const std::string getCode(const std::string &amp;cmd);
+-const std::string getSerial(const std::string &amp;cmd);
+-User *execCommandAuth(const std::string &amp;, User *);
+--
+&lt;&lt;construtor&gt;&gt;-DbComm();
+-std::map&lt;std::string, std::string&gt; _refCode;
+-std::map&lt;std::string, User *(User::*)(User *)&gt; _userInterface;
+-std::map&lt;std::string, std::string (Contact::*)(const std::string &amp;cmd)&gt; _contact;
+-static DbComm *_instance;
+-std::string to_send;
+-std::string to_recup;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>300</x>
+      <y>600</y>
+      <w>312</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+Génére une session pour le client</panel_attributes>
+    <additional_attributes>500.0;20.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>252</x>
+      <y>336</y>
+      <w>36</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*Client*
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>348</y>
+      <w>402</w>
+      <h>228</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;
+Client &lt;- Communication -&gt; Serveur</panel_attributes>
+    <additional_attributes>10.0;20.0;650.0;20.0;650.0;360.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1650</x>
+      <y>0</y>
+      <w>276</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>bg=red
+*Class Serial*
+--
+template&lt;typename T&gt;
++static const std::string save(const T *);
+template&lt;typename T&gt;
++static T *load(const std::string &amp;);
+--
+&lt;&lt;constructor&gt;&gt;-Serial();
+&lt;&lt;destructor&gt;&gt;-~Serial();
+&lt;&lt;constructor par copie&gt;&gt;-Serial(const Serial &amp;) = delete;
+-Serial &amp;operator=(const Serial &amp;) = delete;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1650</x>
+      <y>162</y>
+      <w>276</w>
+      <h>414</h>
+    </coordinates>
+    <panel_attributes>bg=blue
+*class User*
+--
+friend class boost::serialization::access;
+template&lt;class Archive&gt;
+-void serialize(Archive &amp;ar, const unsigned int version)
+--
+&lt;&lt;constructor&gt;&gt;+User();
+&lt;&lt;destructor&gt;&gt;+~User();
++User *Add_User(User *);
++User *GetLogin(User *);
++User *GetContact(User *);
++User *setStatusOff(User *);
++User *retrieveContactList(User *);
++const std::string &amp;getFname() const;
++const std::string &amp;getLname() const;
++const std::string &amp;getUsername() const;
++const std::string &amp;getMail() const;
++const std::string &amp;getPwd() const;
++const std::string &amp;getIp() const;
++const std::string &amp;getPort() const;
++const std::vector&lt;std::string&gt; &amp;getContactList() const;
++void pushContact(const std::string &amp;);
++bool getStatus() const;
++const int getId() const;
++void setFname(const std::string &amp;);
++void setLname(const std::string &amp;);
++void setUsername(const std::string &amp;);
++void setMail(const std::string &amp;);
++void setPwd(const std::string &amp;);
++void setIp(const std::string &amp;);
++void setPort(const std::string &amp;);
++void setStatus(bool);
++void setId(const int);
+--
+-int _id;
+-std::string _Fname;
+-std::string _Lname;
+-std::string _Username;std::string _Mail;
+-std::string _Pwd;
+-std::string _Ip;
+-std::string _Port;
+-bool _Status;
+-std::vector&lt;std::string&gt; _contact;
+-Dbcall *_dbcall;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2118</x>
+      <y>516</y>
+      <w>276</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>bg=green
+*&lt;&lt;Signleton&gt;&gt;*
+*class Dbcall*
+--
+&lt;&lt;constructor&gt;+Dbcall(const Dbcall &amp;) = delete;
++Dbcall &amp;operator=(const Dbcall &amp;) = delete;
+&lt;&lt;destructor&gt;&gt;+~Dbcall();
++bool		Select_inbd(std::string , std::string, std::string);
++std::string	Add_inContact(std::string friendId, std::string username);
++static Dbcall 	*getInstance();
++bool Add_inbd(void *);
++bool Update_indb(const std::string &amp;, std::string, std::string);
++void prepareSQL();
++void *checkLogin(void *);
++void *retrieveContact(void *);
++void *retrieveContactList(void *);
++void *updateStatusOff(void *);
++static int callback(void *, int, char **, char **);
++static int callbackSignup(void *, int, char **, char **);
++static int callbackLogin(void *, int, char **, char **);
++static int callbackgetContact(void *, int, char **, char **);
++static int callbackgetContactList(void *, int, char **, char **);
+--	
+-static Dbcall	*_instance;
+-sqlite3			*_DB;
+-Dbcall();
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1650</x>
+      <y>648</y>
+      <w>276</w>
+      <h>186</h>
+    </coordinates>
+    <panel_attributes>bg=blue
+*Class Contact*
+--
+&lt;&lt;constructor&gt;&gt;+Contact();
+&lt;&lt;destructor&gt;&gt;~Contact();
++std::string addCTTUser(const std::string &amp;);
++const std::string &amp;GetCTTUser() const;
++const std::string &amp;GetCTTFriend() const;
++const std::string &amp;GetIsvalid() const;
++void SetCTTFriend(const std::string &amp;);
++void SetIsvalid(const std::string &amp;);
+--
+-Dbcall	        *dbcall;
+-std::string     _CttUser;
+-std::string     _CttFriend;
+-std::string     _Isvalid;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>2946</x>
+      <y>486</y>
+      <w>276</w>
+      <h>348</h>
+    </coordinates>
+    <panel_attributes>SQLITE3
+--
+bg=orange
+Table T_USER
+Table T_CONTACT</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>144</x>
+      <y>354</y>
+      <w>120</w>
+      <h>138</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+Requête de connexion</panel_attributes>
+    <additional_attributes>10.0;210.0;10.0;10.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>798</x>
+      <y>630</y>
+      <w>258</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;410.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1428</x>
+      <y>354</y>
+      <w>234</w>
+      <h>294</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;470.0;370.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1920</x>
+      <y>354</y>
+      <w>210</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;330.0;460.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2388</x>
+      <y>618</y>
+      <w>570</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>930.0;20.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1752</x>
+      <y>102</y>
+      <w>18</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1806</x>
+      <y>102</y>
+      <w>18</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1428</x>
+      <y>654</y>
+      <w>234</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;370.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1920</x>
+      <y>642</y>
+      <w>210</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;160.0;330.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>480</y>
+      <w>306</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*BOOST::ASIO ASYNCHRONE SERVER*
+*IO_SERVICE.run() -&gt; LAUNCH THE SERVER*
+bg=red
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>144</x>
+      <y>498</y>
+      <w>18</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

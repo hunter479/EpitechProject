@@ -1,0 +1,19 @@
+[Unit]
+Description={{ name }}
+After=network.target
+
+[Service]
+Type=simple
+
+Environment="POSTGRESQL_HOST={{ POSTGRESQL_HOST }}"
+Environment="POSTGRESQL_USER={{ POSTGRESQL_USER }}"
+Environment="POSTGRESQL_PASSWORD={{ POSTGRESQL_PASSWORD }}"
+Environment="POSTGRESQL_DB={{ POSTGRESQL_DB }}"
+Environment="POSTGRESQL_PORT={{ POSTGRESQL_PORT }}"
+Environment="REDIS_HOST={{ REDIS_HOST }}"
+WorkingDirectory=/app/{{ name }}
+ExecStart={{ command }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

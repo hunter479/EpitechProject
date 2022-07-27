@@ -1,0 +1,19 @@
+===== Protocole Server =====
+- Server asynchrone en cpp
+- Librairie boost
+
+
+TCP//
+
+420 "OK"
+404 "ERROR"
+
+120 "Vérifie si le contact est connecté"
+130 "Ajout d'un contact"
+140 "supprimer un contact"
+150 "Récupérer la liste des contacts"
+160 "Mettre à jour un contact"
+220 "S'inscrire"
+230 "Connection"
+
+faire une classe utilisateur

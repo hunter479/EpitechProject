@@ -1,0 +1,6 @@
+.footerStyle {
+    position: fixed;
+    bottom: 0;
+    overflow: auto;
+    width: 100%;
+}

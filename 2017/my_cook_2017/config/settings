@@ -1,0 +1,6 @@
+background 0 -300 assets/bg.png 1.2 0 0 1200 1600 misc settings		\\
+music 700 0 assets/speaker.png 0.5 0 0 512 512 oneclick	settings	\\
+return 10 891 assets/back.png 0.7 0 0 173 439 button settings		\\
+960*540 200 200 assets/960*540.png 1 0 0 173 439 button	settings	\\
+1920*1080 200 400 assets/1920*1080.png 1 0 0 173 439 button settings	\\
+resolution 200 100 assets/resolution.png 1 0 0 53 449 misc settings	\\

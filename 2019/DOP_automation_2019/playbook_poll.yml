@@ -1,0 +1,12 @@
+---
+- name: Poll
+  hosts: poll
+  user: root
+  become: true
+  gather_facts: no
+  vars:
+    import_playbook: ./group_vars/all.yml
+    name: poll
+    command: bash -c "flask run --host=0.0.0.0 --port=80"
+  roles:
+    - poll

@@ -1,0 +1,10 @@
+[requires]
+pcre/8.41@bincrafters/stable
+pcre2/10.32@bincrafters/stable
+qt/5.12.5@bincrafters/stable
+boost/1.71.0@conan/stable
+opus/1.3.1@bincrafters/stable
+portaudio/v190600.20161030@bincrafters/stable
+
+[generators]
+cmake

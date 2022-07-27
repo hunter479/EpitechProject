@@ -1,0 +1,12 @@
+---
+- name: Result
+  hosts: worker
+  user: root
+  become: true
+  gather_facts: no
+  vars:
+    import_playbook: ./group_vars/all.yml
+    name: worker
+    command: bash -c "java -jar ./target/worker-jar-with-dependencies.jar"
+  roles:
+    - worker

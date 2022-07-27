@@ -1,0 +1,9 @@
+	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\-----READ ME-----//////////////////////////////
+	\\\\\\\\\\							   //////////
+\\\\\\\\\\	Config files are used to build a scene				//////////
+\\\\\\\\\\	You should not mess around with them				//////////
+\\\\\\\\\\									//////////
+\\\\\\\\\\	They are built as follow:					//////////
+\\\\\\\\\\	keyword x y texture scale left top height width class scene	//////////
+	\\\\\\\\\\							   //////////
+	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\------------------//////////////////////////////

@@ -1,0 +1,12 @@
+---
+- name: Result
+  hosts: result
+  user: root
+  become: true
+  gather_facts: no
+  vars:
+    import_playbook: ./group_vars/all.yml
+    name: result
+    command: bash -c "node ."
+  roles:
+    - result

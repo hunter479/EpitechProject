@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>6</zoom_level>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>732</x>
+      <y>744</y>
+      <w>120</w>
+      <h>102</h>
+    </coordinates>
+    <panel_attributes>db.area
+--
+image: mongo
+restart: on-failure
+networks:
+- backend-tier
+expose:
+- "27017"
+volumes:
+- db-data:/data/db
+valign=top
+halign=left
+bg=orange
+layer=2
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>804</x>
+      <y>588</y>
+      <w>210</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>mongo_ui.area
+--
+image: mongo-express
+restart: on-failure
+environment:
+- ME_CONFIG_MONGODB_SERVER=db_mongodb
+- ME_CONFIG_MONGODB_PORT=27017
+networks:
+- backend-tier
+expose:
+- "8082"
+depends_on:
+- db.area
+
+bg=orange
+valign=top
+halign=left
+layer=2
+
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1038</x>
+      <y>588</y>
+      <w>192</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>portainer.area
+--
+image: portainer/portainer
+restart: always
+volumes:
+- /var/run/docker.sock:/var/run/docker.sock
+- portainer_data:/data
+networks:
+- backend-tier
+bg=red
+valign=top
+halign=left
+
+group=7</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>666</x>
+      <y>588</y>
+      <w>114</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>serveur
+--
+bg=orange
+valign=top
+halign=left
+layer=2
+build: ./server
+restart: on-failure
+expose:
+- "8080"
+networks:
+- tunnel-tier
+- backend-tier
+depends_on:
+- db.area
+- mongo_ui.area
+
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>282</x>
+      <y>408</y>
+      <w>144</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>ca.area
+--
+build: ./certificate
+volumes:
+- $PWD/certificate:/certs
+bg=green
+valign=top
+halign=left
+
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>282</x>
+      <y>282</y>
+      <w>126</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;VOLUMES&gt;&gt;
+--
+*db-data:*
+*portainer_data:*
+
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>282</x>
+      <y>342</y>
+      <w>126</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;NETWORKS&gt;&gt;
+--
+*tunnel-tier:*
+*backend-tier:*
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>348</x>
+      <y>588</y>
+      <w>174</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>client_web
+--
+build:
+context: ./client
+dockerfile: web.Dockerfile
+container_name: web
+restart: on-failure
+expose:
+- "8081"
+networks:
+- tunnel-tier
+bg=yellow
+valign=top
+halign=left
+
+layer=2
+group=5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>588</x>
+      <y>588</y>
+      <w>438</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>backend-tier
+layer=1
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>708</x>
+      <y>702</y>
+      <w>36</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+group=6</panel_attributes>
+    <additional_attributes>40.0;160.0;10.0;160.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>846</x>
+      <y>708</y>
+      <w>42</w>
+      <h>102</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+group=6</panel_attributes>
+    <additional_attributes>10.0;150.0;50.0;150.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>294</x>
+      <y>588</y>
+      <w>282</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>front-tier
+layer=1
+group=5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>360</x>
+      <y>528</y>
+      <w>60</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*8081*
+fontsize=18
+halign=center
+group=5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>660</x>
+      <y>528</y>
+      <w>60</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*8080*
+fontsize=18
+halign=center
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>696</x>
+      <y>228</y>
+      <w>204</w>
+      <h>222</h>
+    </coordinates>
+    <panel_attributes>proxy.area
+--
+build: ./nginx
+restart: on-failure
+ports:
+- "8080:8080"
+- "8081:8081"
+- "8083:8082"
+- "9000:9000"
+networks:
+- tunnel-tier
+- backend-tier
+volumes:
+- /var/log:/var/log
+- $PWD/nginx/conf/conf.d:/etc/nginx/conf.d
+- $PWD/certificate/certs:/etc/ssl/area
+depends_on:
+- ca.area
+- portainer.area
+- client_web
+- db.area
+- mongo_ui.area
+valign=top
+halign=left
+bg=cyan
+
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>816</x>
+      <y>528</y>
+      <w>60</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*8082*
+fontsize=18
+halign=center
+group=6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>384</x>
+      <y>546</y>
+      <w>18</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+group=5</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>684</x>
+      <y>546</y>
+      <w>18</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+group=6</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>840</x>
+      <y>546</y>
+      <w>18</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+group=6</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1038</x>
+      <y>528</y>
+      <w>78</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*9000*
+from image
+fontsize=18
+halign=center
+group=7</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1068</x>
+      <y>552</y>
+      <w>18</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+group=7</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>276</x>
+      <y>228</y>
+      <w>990</w>
+      <h>672</h>
+    </coordinates>
+    <panel_attributes>***docker-compose***
+layer=-1
+fontsize=22</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>594</x>
+      <y>72</y>
+      <w>306</w>
+      <h>114</h>
+    </coordinates>
+    <panel_attributes>TO HOST
+--
+halign=center
+valign=top
+fontsize=22
+8080 ("API")
+8081 ("WEB")
+8083 ("MONGO UI")
+9000 ("PORTAINER")</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>744</x>
+      <y>180</y>
+      <w>18</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>414</x>
+      <y>444</y>
+      <w>348</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>560.0;10.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>684</x>
+      <y>444</y>
+      <w>96</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>140.0;10.0;10.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>786</x>
+      <y>444</y>
+      <w>72</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>816</x>
+      <y>444</y>
+      <w>240</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;380.0;140.0</additional_attributes>
+  </element>
+</diagram>

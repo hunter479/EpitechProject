@@ -1,0 +1,9 @@
+---
+# <ansible_base_dir>/group_vars/all
+POSTGRESQL_HOST: "{{hostvars['postgresql'].ansible_host}}"
+POSTGRESQL_USER: paul
+POSTGRESQL_PASSWORD: "{{lookup('file', './vault.yml')}}"
+POSTGRESQL_DB: paul
+POSTGRESQL_PORT: 5432
+RESULT_PORT: 5001
+REDIS_HOST: "{{hostvars['redis'].ansible_host}}"

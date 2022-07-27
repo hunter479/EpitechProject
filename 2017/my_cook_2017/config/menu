@@ -1,0 +1,5 @@
+background 0 -300 assets/bg.png 1.20 0 0 1200 1600 misc	menu	\\
+title -50 -75 assets/title.png 1 0 0 1080 1920 misc menu	\\
+play 275 300 assets/play.png 1 0 0 173 439 button menu		\\
+settings 275 500 assets/settings.png 1 0 0 173 439 button menu	\\
+quit 275 700 assets/quit.png 1 0 0 173 439 button menu		\\

@@ -1,0 +1,16 @@
+USAGE
+
+./my_cook [OPTION]
+-h : print this page.
+No option, launch the game.
+
+DESCRIPTIONS
+
+my_cook is an Epitech Project which is based on the game " Cook, Serve, Delicious! ".
+
+INTERACTIONS
+
+Click on buttons to navigate through the menu.
+Click on ingredients to add them to your preparation.
+Press the ESCAPE key to pause the game.
+

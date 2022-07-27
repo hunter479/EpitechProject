@@ -1,0 +1,33 @@
+---
+- name: "Create /app directory"
+  file:
+    path: /app
+    state: directory
+- name: "Copy of the file"
+  copy:
+    src: poll.tar
+    dest: /app
+- name: "Install python && python-pip"
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - python
+      - python-pip
+- name: "Untar the file"
+  unarchive:
+    src: /app/poll.tar
+    dest: /app
+    remote_src: yes
+- name: "Install pip packages"
+  pip:
+    requirements: /app/poll/requirements.txt
+- name: "Generating poll.service"
+  template:
+    src: files/poll.service
+    dest: /etc/systemd/system/poll.service
+- name: "Launch Flask Server"
+  service:
+    name: poll
+    enabled: yes
+    state: started

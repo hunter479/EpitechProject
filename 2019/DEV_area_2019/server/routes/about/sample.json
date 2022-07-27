@@ -1,0 +1,109 @@
+{
+    "client": {
+        "host": ""
+    },
+    "server": {
+        "current_time": "",
+        "services" : [{
+            "name": "Facebook",
+            "actions": [{
+                "name": "new_post",
+                "description": "A new post is posted by the user"
+            }, {
+                "name": "new_picture_of_user",
+                "description": "A new picture of the user has been posted"
+            }, {
+                "name": "number_of_friends",
+                "description": "The number of the friends user have changed"
+            }, {
+                "name": "new_picture_from_the_ser",
+                "description": "The user posted a new picture"
+            }]
+        }, {
+            "name": "Spotify",
+            "reactions": [{
+                "name": "next_track",
+                "description": "The user change for the next track"
+            }, {
+                "name": "pause",
+                "description": "The user pause the track"
+                }]
+        }, {
+            "name": "Imgur",
+            "actions": [{
+                "name": "new_fav",
+                "description": "The user fav a new image"
+            }, {
+                "name": "new_comm",
+                "description": "The new user posted a new comm"
+            }, {
+                "name": "new_image",
+                "description": "The user posted a new image"
+            }]
+        }, {
+            "name": "Steam",
+            "actions": [{
+                "name": "Last_log_off",
+                "description": "Get the last log of the user"
+            }]
+        }, {
+            "name": "Intra",
+            "actions": [{
+                "name": "New_notif",
+                "description": "Get when there is a new notification"
+            }, {
+                "name": "Update_Credits",
+                "description": "Get the number of credits of the user"
+            }, {
+                "name": "Update_Netsouls",
+                "description": "Get Time Log of the user"
+            }]
+        }, {
+            "name": "GitLab",
+            "actions": [{
+                "name": "Update_commit",
+                "description": "The user did a commit"
+            }]
+        }, {
+            "name": "Twitter",
+            "actions": [{
+                "name": "Search_Tweet",
+                "description": "Look for a twitter with a specific sentence"
+            }],
+            "reactions": [{
+                "name": "Post_Status",
+                "description": "Make a post"
+            }, {
+                "name": "Retweet",
+                "description": "Repost a Tweet with a specific word"
+            }]
+        }, {
+            "name": "Gmail",
+            "reactions": [{
+                "name": "sendMail",
+                "description": "Send a mail"
+            }]
+        }, {
+            "name": "Microsoft",
+            "reactions": [{
+                "name": "newMail",
+                "description": "Send a mail"
+            }]
+        }, {
+            "name": "Weather",
+            "actions": [{
+                "name": "Temperature_update",
+                "description": "Get when the temperature have changed"
+            }, {
+                "name": "Wind_Speed",
+                "description": "Get update of the weed speed"
+            }]
+        }, {
+            "name": "Yammer",
+            "reactions": [{
+                "name": "Post_message",
+                "description": "Post a message in a specific groupe"
+            }]
+        }]
+    }
+}

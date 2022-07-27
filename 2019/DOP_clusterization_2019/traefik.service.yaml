@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-ingress-service
+  namespace: kube-public
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  type: LoadBalancer
+  ports:
+    - name: web
+      port: 30021
+      targetPort: 80
+    - name: admin
+      port: 30042
+      targetPort: 8080
+

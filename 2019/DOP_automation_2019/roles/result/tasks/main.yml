@@ -1,0 +1,41 @@
+---
+- name: "Create /app directory"
+  file:
+    path: /app
+    state: directory
+- name: "Copy of the file"
+  copy:
+    src: result.tar
+    dest: /app/
+- name: "Getting Node.js PPA script"
+  get_url:
+    url: https://deb.nodesource.com/setup_13.x
+    dest: /tmp/npm.sh
+    mode: 0755
+- name: "Starting Node.js PPA script"
+  shell: "/tmp/npm.sh"
+- name: "Install packages"
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - python-apt
+      - nodejs
+- name: "Untar the file"
+  unarchive:
+    src: /app/result.tar
+    dest: /app
+    remote_src: yes
+- name: "Installing npm packages"
+  npm:
+    path: /app/result
+    state: latest
+- name: "Generating result.service"
+  template:
+    src: files/result.service
+    dest: /etc/systemd/system/result.service
+- name: "Launching Server"
+  service:
+    name: result
+    enabled: yes
+    state: started

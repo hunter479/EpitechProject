@@ -1,0 +1,10 @@
+---
+- name: "Base"
+  hosts: all
+  user: root
+  become: true
+  gather_facts: no
+  vars:
+    import_playbook: ./group_vars/all.yml
+  roles:
+    - base

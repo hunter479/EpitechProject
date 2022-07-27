@@ -1,0 +1,49 @@
+name:                funImageCompressor
+version:             0.1.0.0
+github:              "Nijinski/funImageCompressor"
+license:             BSD3
+author:              "Edesp"
+maintainer:          "eddy.despagne@epitech.eu"
+copyright:           "EdoCorp©"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Project
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/Nijinski/funImageCompressor#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- random
+
+library:
+  source-dirs: src
+
+executables:
+  imageCompressor-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - funImageCompressor
+
+tests:
+  funImageCompressor-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - funImageCompressor
