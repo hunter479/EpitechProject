@@ -1,2 +1,2 @@
 # EpitechProject
-This is all my epitech school project first to third year.
+These are all my EPITECH school projects from the first to the third year.
